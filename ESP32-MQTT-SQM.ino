@@ -8,6 +8,7 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <Update.h>
+#include <ArduinoJson.h>
 #include "arduino_secrets.h"
 
 //============ Setup Sensor============
@@ -16,16 +17,17 @@ Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); // pass in a number for the senso
 //============ Setup WIFI and MQTT Details============
 WiFiClient espClient;
 PubSubClient client(espClient);
+DynamicJsonDocument doc(256);
 
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASS;
-const char* host = NETWORK_HOSTNAME;
+const char* ssid        = WIFI_SSID;
+const char* password    = WIFI_PASS;
+const char* host        = NETWORK_HOSTNAME;
 const char* mqtt_broker = MQTT_BROKER;
-const int mqtt_port = MQTT_PORT;
-String clientId = MQTT_CLIENT;
-const long interval = MQTT_UPDATE_INTERVAL;
-const char* mpsas_pub = MQTT_TOPIC;
-String sqm_2;
+const int mqtt_port     = MQTT_PORT;
+String clientId         = MQTT_CLIENT;
+const long interval     = MQTT_UPDATE_INTERVAL;
+const char* sqm_json     = MQTT_SQM_JSON_TOPIC;
+char json_string[256];
 unsigned long previousMillis = 0;
 
 //============ Configure Sensor============
@@ -44,7 +46,7 @@ int DARK_FULL = 0;
 
 //  And variables for IR, FULL, Lux and SQM so we can manipulate them
 unsigned long IR, FULL;
-float LUX, SQM;
+float LUX, SQM, VISIBLE, INFRARED;
 
 // This factor is used to calculate visual magnitude from Lux. Default is 1.00 which assumes
 // the sensor reads accurately in Lux, change it until magnitude readings scale correctly.
@@ -173,12 +175,49 @@ const char* serverIndex =
   "});"
   "</script>";
 
+template <class T>
+String type_name(const T&)
+{   
+    String s = __PRETTY_FUNCTION__;
+
+    int start = s.indexOf("[with T = ") + 10;
+    int stop = s.lastIndexOf(']');
+
+    return s.substring(start, stop);
+}
+
+void jsonCreation() {
+//  JsonObject SQM_Meter = doc.createNestedObject("SQM_Meter");
+  doc["SQM"] = SQM;
+  doc["VISIBLE"] = VISIBLE;
+  doc["INFRARED"] = INFRARED;
+  doc["LUX"] = LUX;
+  char buffer[256];
+  serializeJson(doc, buffer);
+  int i = client.publish(sqm_json, buffer);
+  Serial.println("----- JSON Data -----");
+  Serial.println(buffer); 
+  Serial.println("---------------------");
+  Serial.print("Successeses: ");    Serial.println(i);
+  Serial.print("sqm_json type: ");  Serial.println(type_name(sqm_json));
+  Serial.print("buffer type: ");    Serial.println(type_name(buffer));
+  Serial.println("---------------------");
+}
+
 //============ Primary Setup ============
 void setup(void)
 {
   Serial.begin(9600);
+  delay(10000);
   setup_wifi();
+  Serial.println("Attempting MQTT connection...");
   client.setServer(mqtt_broker, mqtt_port);
+  client.setBufferSize(512);
+  if (client.connect(clientId.c_str())) {
+    Serial.print("MQTT connected, client state: ");
+    Serial.println(client.state());
+  }
+
   Serial.println("Testing TSL2591 connection...");
   if (tsl.begin())
   {
@@ -238,6 +277,7 @@ void setup(void)
   });
   server.begin();
 }
+
 //============ Function to read IR and Full Spectrum at once and convert to lux ============
 void advancedRead(void)
 {
@@ -252,20 +292,8 @@ void advancedRead(void)
   IR = IR + ir - DARK_IR;
   FULL = FULL + full - DARK_FULL;
 
-  //This section will send raw readings to the serial monitor, useful for diagnostics
-
-  if (client.connect(clientId.c_str())) {
-    Serial.println("MQTT connected");
-  }
-  else {
-    Serial.print("failed, rc=");
-    Serial.println(client.state());
-  }
-  Serial.print("IR: "); Serial.print(ir);  Serial.print("  ");
-  Serial.print("Full: "); Serial.print(full); Serial.print("  ");
-  Serial.print("Visible: "); Serial.print(full - ir); Serial.print("  ");
-  Serial.print("Lux: "); Serial.println(tsl.calculateLux(full, ir), 6);
-  Serial.print("SQM: "); Serial.println(SQM);
+  VISIBLE   = full - ir;
+  INFRARED  = ir; 
 }
 
 //============ Calculate Results ============
@@ -288,7 +316,6 @@ void loop(void)
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
     Results();
-    //============ Publish results to MQTT ============
-    client.publish(mpsas_pub, (char*) String(SQM).c_str());
+    jsonCreation();
   }
 }
