@@ -1,6 +1,6 @@
 ## SQM Meter using ESP32, TSL2591 and MQTT
 
-Simple SQM meter that sends SQM values to a MQTT broker using an ESP32.
+Simple SQM meter that sends SQM values to a MQTT broker using an ESP32. I have included ArduinoOTA for remote firmware updates as once sealed and mounted outside, it would be hard to take the meter down for updates using a cable.
 
 Credit to Stub Mandrel (Neil Wyatt) for writing the code I've used heavily here
 
