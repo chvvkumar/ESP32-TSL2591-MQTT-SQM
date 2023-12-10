@@ -15,6 +15,9 @@ https://theawesomegarage.com/blog/multisensor-with-3d-printed-enclosure-for-esph
 Use Adafruit's documentation to wire up the sensor. I used the Adafruit Stemma 4-pin connectors and cables so wiring was a breeze.
 https://learn.adafruit.com/adafruit-tsl2591/wiring-and-test
 
+![image](https://github.com/chvvkumar/ESP32-TSL2591-MQTT-SQM/assets/16548147/ab31b7b5-778d-46de-a095-1e929a6aa016)
+
+
 **Libraries**
 
 Libraries should be installed first and these can be found by searching the library installer in Arduino IDE for the headers at the top of the main program.
