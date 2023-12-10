@@ -2,6 +2,10 @@
 
 Simple SQM meter that sends SQM values to a MQTT broker using an ESP32.
 
+Credit to Stub Mandrel (Neil Wyatt) for writing the code I've used heavily here
+
+http://www.stubmandrel.co.uk/astronomy/237-sky-quality-meter
+
 **Wiring**
 
 Use Adafruit's documentation to wire up the sensor. I used the Adafruit Stemma 4-pin connectors and cables so wiring was a breeze.
