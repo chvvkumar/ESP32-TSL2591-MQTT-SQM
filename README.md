@@ -26,3 +26,20 @@ Secrets are stored in the `arduino_secrets.h` file, customize it to your needs.
 **ArduinoOTA Login**
 
 admin/admin
+
+
+**Home Assistant MQTT Sensor**
+
+    - name: "SQM Meter"
+      state_topic: "Astro/SQMMeter"
+      value_template: "{{ value_json.SQM }}"
+      json_attributes_topic: "Astro/SQMMeter"
+      json_attributes_template: "{{ value_json | tojson }}"
+      unique_id: bac9xl4sfggfdwpo56vj2g8ye
+      unit_of_measurement: "mag/arcsec²"
+
+
+Screenshots:
+
+![image](https://github.com/chvvkumar/ESP32-TSL2591-MQTT-SQM/assets/16548147/3af5694d-77a5-41e7-b100-ee946fabea12)
+
