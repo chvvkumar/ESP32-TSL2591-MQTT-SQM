@@ -6,6 +6,10 @@ Credit to Stub Mandrel (Neil Wyatt) for writing the code I've used heavily here
 
 http://www.stubmandrel.co.uk/astronomy/237-sky-quality-meter
 
+I remixed the case from here to cover up the holes and make it a bit better at not letting rain inside the housing. I sealed any opening and the seam between the lid and the main cover body with hot glue.:
+
+https://theawesomegarage.com/blog/multisensor-with-3d-printed-enclosure-for-esphome-and-home-assistant
+
 **Wiring**
 
 Use Adafruit's documentation to wire up the sensor. I used the Adafruit Stemma 4-pin connectors and cables so wiring was a breeze.
