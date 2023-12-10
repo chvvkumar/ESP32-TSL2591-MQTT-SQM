@@ -26,7 +26,7 @@ const char* mqtt_broker = MQTT_BROKER;
 const int mqtt_port     = MQTT_PORT;
 String clientId         = MQTT_CLIENT;
 const long interval     = MQTT_UPDATE_INTERVAL;
-const char* sqm_json     = MQTT_SQM_JSON_TOPIC;
+const char* sqm_json    = MQTT_SQM_JSON_TOPIC;
 char json_string[256];
 unsigned long previousMillis = 0;
 
